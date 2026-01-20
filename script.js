@@ -2,7 +2,7 @@
 // 🔗 CONEXIÓN CON EL BACKEND (NODE.JS)
 // ===============================================================
 // const BACKEND_URL = "http://localhost:5000/chat";
-const BACKEND_URL = "https://unspiritually-unparodied-hendrix.ngrok-free.dev";
+const BACKEND_URL ="https://unspiritually-unparodied-hendrix.ngrok-free.dev/chat";
 
 // NOTA: La variable DB_CONTEXT (instrucciones de IA) ahora vive en tu servidor (Backend)
 // para proteger la seguridad de tu prompt.
