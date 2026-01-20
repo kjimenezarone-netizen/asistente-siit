@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soporte Técnico SIIT - DLP Avanzado</title>
+    <style>
+        :root {
+            --primary: #9f0e0e; 
+            --secondary: #2c3e50; 
+            --bg-body: #f8f9fa; 
+            --panel-bg: #ffffff; 
+            --text-main: #333333; 
+            --border: #e0e0e0;
+            --chat-bot: #ffffff; 
+            --console-bg: #101010;
+            --console-text: #00ff00;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            flex-direction: row; 
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- IZQUIERDA: CHAT --- */
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--panel-bg);
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            height: 100%;
+            z-index: 10;
+        }
+
+        .header {
+            padding: 15px 25px;
+            background: white;
+            border-bottom: 4px solid var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .header-title h1 { margin: 0; font-size: 1.2rem; color: var(--primary); text-transform: uppercase; font-weight: 800; }
+        .header-title span { font-size: 0.8rem; color: #666; font-weight: 500; }
+
+        .status-badge { 
+            background: #e8f5e9; color: #2e7d32; padding: 5px 10px; 
+            border-radius: 4px; font-size: 0.7rem; font-weight: bold; 
+            border: 1px solid #c8e6c9; display: flex; align-items: center; gap: 5px;
+        }
+        .status-dot { width: 8px; height: 8px; background: #2e7d32; border-radius: 50%; display: inline-block; animation: blink 2s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+
+        .chat-area {
+            flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px;
+            background-color: #fafafa; 
+            background-image: radial-gradient(#d1d1d1 1px, transparent 1px); 
+            background-size: 20px 20px;
+        }
+
+        .message {
+            max-width: 80%; padding: 15px 20px; border-radius: 8px; line-height: 1.5;
+            font-size: 0.9rem; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .bot { align-self: flex-start; background: var(--chat-bot); border-left: 4px solid var(--primary); color: var(--text-main); border: 1px solid var(--border); }
+        .user { align-self: flex-end; background: var(--secondary); color: white; border-bottom-right-radius: 0; }
+        
+        /* Highlight para datos restaurados en el chat */
+        .restored-data { background-color: #fff3cd; color: #856404; padding: 0 4px; border-radius: 3px; font-weight: bold; border-bottom: 1px dotted #856404; cursor: help; }
+
+        .input-area { padding: 20px; background: white; border-top: 1px solid var(--border); display: flex; gap: 10px; align-items: center; }
+        input { flex: 1; padding: 12px; border-radius: 4px; border: 2px solid var(--border); background: #fff; font-size: 0.95rem; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(159, 14, 14, 0.1); }
+        button { padding: 12px 25px; background: var(--primary); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button:hover { background: #800000; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+
+        .typing-indicator { display: none; align-self: flex-start; font-style: italic; color: #666; font-size: 0.8rem; margin-left: 10px; background: rgba(255,255,255,0.8); padding: 5px 10px; border-radius: 20px; border: 1px solid #eee; }
+        
+        /* --- DERECHA: CONSOLA DE AUDITORÍA AVANZADA --- */
+        .audit-panel {
+            width: 420px;
+            background-color: var(--console-bg);
+            color: var(--console-text);
+            font-family: 'Consolas', 'Courier New', monospace;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            border-left: 4px solid #333;
+            font-size: 0.75rem;
+        }
+        
+        .audit-header {
+            background: #1a1a1a;
+            padding: 15px;
+            border-bottom: 1px solid #333;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .log-container {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            gap: 6px;
+        }
+
+        .log-entry { margin-bottom: 4px; border-bottom: 1px solid #222; padding-bottom: 4px; word-wrap: break-word; line-height: 1.4; }
+        .log-time { color: #555; font-size: 0.7rem; }
+        
+        .tag-in { color: #00ffff; font-weight: bold; } 
+        .tag-dlp { color: #ff3333; font-weight: bold; } 
+        .tag-out { color: #ffff00; font-weight: bold; } 
+        .tag-ok { color: #00ff00; font-weight: bold; }
+
+        .sensitive-block {
+            display: block;
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff3333;
+            color: #ffcccc;
+            padding: 5px;
+            margin-top: 5px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+        }
+        
+        .token-map { color: #aaa; font-style: italic; }
+
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <div class="header">
+            <div class="header-title">
+                <h1>Soporte Técnico SIIT</h1>
+                <span>SDAN-DINI | DLP (Data Loss Prevention) Activado</span>
+            </div>
+            <div class="status-badge">
+                <span class="status-dot"></span> SERVIDOR PROXY SEGURO
+            </div>
+        </div>
+
+        <div class="chat-area" id="chatBox">
+            <div class="message bot">
+                <strong>Asistente de Seguridad de Información</strong><br>
+                Sistema iniciado. El módulo de <b>Privacidad Estricta</b> está activo.<br>
+                Se bloquearán: DNI, RUC, Nombres, Direcciones, Empresas y Contacto.
+            </div>
+        </div>
+
+        <div class="typing-indicator" id="loader">
+            <span style="display:inline-block; animation: spin 1s infinite">🛡️</span> Analizando PII y Encriptando...
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Escriba su consulta..." autocomplete="off">
+            <button id="sendBtn" onclick="handleSend()">ENVIAR SEGURO</button>
+        </div>
+    </div>
+    
+    <div class="audit-panel">
+        <div class="audit-header">
+             🔒 Motor de Privacidad (Vault)
+        </div>
+        <div class="log-container" id="logContainer">
+            <div class="log-entry" style="color:white">
+                <span class="log-time">[INIT]</span> Cargando reglas de Regex...<br>
+                <span class="log-time">[INIT]</span> Filtros: DNI, RUC, EMAIL, TELF, DIR, NOM, EMP.<br>
+                <span class="log-time">[READY]</span> Conectado a Proxy Local (Pool de Llaves).
+            </div>
+        </div>
+    </div>
+    
+
+    <script src="script.js"></script>
+
+</body>
+</html>
