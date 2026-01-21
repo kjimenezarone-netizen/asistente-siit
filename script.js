@@ -83,6 +83,9 @@ function protegerDatos(texto) {
     // 4. TELÉFONOS (9 dígitos, empieza con 9)
     seguro = seguro.replace(/\b9\d{8}\b/g, (match) => tokenize(match, 'TELF'));
 
+    // 4.1  Orden de Inspección (Detecta: "OI 12345", "O.I. 12345", "Orden de Inspección 12345")
+    seguro = seguro.replace(/\b(?:OI|O\.I\.|Orden de Inspecci[óo]n)(?:\s+N[°º]?)?\s+\d+\b/gi, (match) => tokenize(match, 'OI'));
+
     // 5. DIRECCIONES (Contextual)
     const regexDir = /(?:viv(?:o|e) en|domicilio|direcci[óo]n|calle|av\.|avenida|jr\.|jir[óo]n|psje\.)\s+([a-zA-Z0-9\.\s\-\#]+?)(?=\s*(?:,|$|\.|y la))/gi;
     seguro = seguro.replace(regexDir, (match, captured) => {
