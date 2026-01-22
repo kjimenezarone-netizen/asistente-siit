@@ -1,0 +1,252 @@
+/* ============================================================
+   ESTILO INSTITUCIONAL SIIT - SUNAFIL (VERSIÓN AZUL)
+   Ref: Basado en imagen visual aprobada (image_3.png)
+   ============================================================ */
+
+:root {
+    /* --- NUEVA PALETA DE COLORES INSTITUCIONALES (AZUL) --- */
+    --primary-color: #0E335E;   /* Azul Profundo Institucional (Header/Botones) */
+    --primary-dark: #082240;    /* Azul más oscuro (Hover) */
+    --accent-blue: #1A5F9E;     /* Azul medio para detalles/bordes */
+    
+    --secondary-text: #2C3E50;  /* Color texto secundario */
+    --bg-light: #F4F6F8;        /* Fondo General */
+    --white: #FFFFFF;
+    --border-light: #E0E0E0;    /* Bordes neutros */
+
+    /* Colores de Chat */
+    --bot-msg-bg: #FFFFFF;
+    --bot-msg-border: var(--accent-blue); /* Borde azul delgado para el bot */
+    --user-msg-bg: var(--primary-color);  /* El usuario usa el azul principal */
+    --user-msg-text: #FFFFFF;
+    
+    /* Tipografía y Efectos */
+    --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* --- RESET BÁSICO --- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: var(--font-main);
+    background-color: var(--bg-light);
+    height: 100vh;
+    height: 100dvh; /* Soporte móvil */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #333;
+}
+
+/* --- CONTENEDOR PRINCIPAL --- */
+.app-container {
+    width: 100%;
+    height: 100%;
+    max-width: 1200px; /* En PC no se estira infinito */
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 0 30px rgba(0,0,0,0.15); /* Sombra más pronunciada como en la imagen */
+}
+
+/* --- HEADER INSTITUCIONAL (AZUL) --- */
+.header {
+    background-color: var(--primary-color); /* Fondo Azul */
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+    color: var(--white); /* Texto blanco */
+}
+
+.header-brand h1 {
+    font-size: 1.3rem;
+    color: var(--white); /* Título blanco */
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.header-brand small {
+    font-size: 0.8rem;
+    color: #AABBD1; /* Subtítulo azul claro para contraste */
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.status-badge {
+    background: #2E7D32; /* Verde seguridad (se mantiene) */
+    color: var(--white);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    border: 1px solid #1B5E20;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #4CAF50; /* Verde más brillante para el punto */
+    border-radius: 50%;
+    animation: blink 2s infinite;
+}
+
+/* --- ÁREA DE CHAT --- */
+.chat-area {
+    flex: 1;
+    background-color: var(--bg-light);
+    padding: 30px 25px; /* Un poco más de espacio */
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    scroll-behavior: smooth;
+}
+
+/* Burbujas de Chat */
+.message {
+    max-width: 80%;
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    position: relative;
+    animation: slideIn 0.3s ease;
+    word-wrap: break-word;
+}
+
+/* Estilo BOT (Blanco con borde azul delgado) */
+.message.bot {
+    align-self: flex-start;
+    background-color: var(--bot-msg-bg);
+    border: 1px solid var(--bot-msg-border); /* Borde azul delgado exacto a la imagen */
+    color: #333;
+    box-shadow: var(--shadow-soft);
+}
+
+.bot-signature {
+    display: block;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #eee;
+    font-size: 0.7em;
+    color: #777;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* Estilo USUARIO (Azul sólido) */
+.message.user {
+    align-self: flex-end;
+    background-color: var(--user-msg-bg); /* Azul institucional */
+    color: var(--user-msg-text); /* Texto blanco */
+    box-shadow: var(--shadow-soft);
+    border: none;
+}
+
+/* --- FOOTER / INPUT --- */
+.input-area {
+    background: var(--white);
+    padding: 20px 25px;
+    border-top: 1px solid var(--border-light);
+}
+
+.input-wrapper {
+    display: flex;
+    gap: 12px;
+    position: relative;
+}
+
+input[type="text"] {
+    flex: 1;
+    padding: 14px 18px;
+    border: 1px solid #CFD8DC;
+    border-radius: 6px;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+    color: #333;
+    background: #F9FAFB;
+    /* Compatibilidad Estándar */
+    appearance: none;
+    -webkit-appearance: none; 
+}
+
+input[type="text"]:focus {
+    border-color: var(--accent-blue);
+    background: var(--white);
+    box-shadow: 0 0 0 3px rgba(26, 95, 158, 0.1); /* Sombra azul suave */
+}
+
+button {
+    background-color: var(--primary-color); /* Botón Azul */
+    color: white;
+    border: none;
+    padding: 0 30px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+button:hover {
+    background-color: var(--primary-dark);
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+button:disabled {
+    background-color: #90A4AE;
+    cursor: not-allowed;
+}
+
+/* --- UTILIDADES --- */
+.typing-indicator {
+    display: none;
+    align-self: center;
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 15px;
+    font-style: italic;
+    background: rgba(255,255,255,0.8);
+    padding: 6px 15px;
+    border-radius: 20px;
+    border: 1px solid #eee;
+}
+
+.footer-legal {
+    text-align: center;
+    font-size: 0.65rem;
+    color: #999;
+    padding: 8px;
+    background: var(--white);
+    border-top: 1px solid #f0f0f0;
+}
+
+/* Animaciones */
+@keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+@keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Media Query Móvil */
+@media (max-width: 600px) {
+    .header { padding: 12px 15px; }
+    .header-brand h1 { font-size: 1.1rem; }
+    .status-badge { display: none; } 
+    .chat-area { padding: 15px; }
+    .message { max-width: 90%; padding: 12px 15px; }
+    .input-area { padding: 15px; }
+    button { padding: 0 20px; font-size: 0.8rem; }
+}

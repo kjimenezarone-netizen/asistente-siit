@@ -1,221 +1,115 @@
 // ===============================================================
-// 🔗 CONEXIÓN CON EL BACKEND (NODE.JS)
+// 🔗 CONFIGURACIÓN DE TU API
 // ===============================================================
-// const BACKEND_URL = "http://localhost:5000/chat";
-const BACKEND_URL ="https://unspiritually-unparodied-hendrix.ngrok-free.dev/chat";
+//const BACKEND_URL = "http://localhost:5000/chat";
+const BACKEND_URL = "https://unspiritually-unparodied-hendrix.ngrok-free.dev/chat";
 
-// NOTA: La variable DB_CONTEXT (instrucciones de IA) ahora vive en tu servidor (Backend)
-// para proteger la seguridad de tu prompt.
-
-// Referencias al DOM (Elementos de la pantalla)
+// Referencias a los elementos de tu HTML (index.html)
 const chatBox = document.getElementById('chatBox');
 const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
 const loader = document.getElementById('loader');
-const logContainer = document.getElementById('logContainer');
 
-// BÓVEDA DE DATOS LOCAL (Almacena temporalmente los datos reales)
-let dataVault = {}; 
+// ===============================================================
+// 👂 ESCUCHADORES DE EVENTOS
+// ===============================================================
 
-// Escuchar tecla ENTER
+// Enviar al presionar Enter
 userInput.addEventListener('keypress', (e) => { 
     if (e.key === 'Enter') handleSend(); 
 });
 
-// ===============================================================
-// 🛠️ SISTEMA DE LOGS Y AUDITORÍA VISUAL
-// ===============================================================
-function addLog(type, text, details = null) {
-    if (!logContainer) return;
-    const time = new Date().toLocaleTimeString();
-    const entry = document.createElement('div');
-    entry.className = 'log-entry';
-    
-    let badge = '';
-    if(type === 'IN') badge = '<span class="tag-in">>> USER:</span>';
-    if(type === 'DLP') badge = '<span class="tag-dlp">!! BLOQUEO:</span>';
-    if(type === 'OUT') badge = '<span class="tag-out"><< IA (Cifrado):</span>';
-    if(type === 'OK') badge = '<span class="tag-ok">OK:</span>';
-    if(type === 'ERR') badge = '<span style="color:red; font-weight:bold">ERROR:</span>';
-
-    let detailBlock = '';
-    if (details) {
-        detailBlock = `<span class="sensitive-block">${details}</span>`;
-    }
-
-    entry.innerHTML = `<span class="log-time">[${time}]</span> ${badge} ${text} ${detailBlock}`;
-    logContainer.appendChild(entry);
-    logContainer.scrollTop = logContainer.scrollHeight;
-}
+// Enviar al hacer click en el botón
+sendBtn.addEventListener('click', handleSend);
 
 // ===============================================================
-// 🔒 MOTOR DE PRIVACIDAD (CLIENT-SIDE DLP)
+// 🚀 LÓGICA PRINCIPAL
 // ===============================================================
-function protegerDatos(texto) {
-    let seguro = texto;
-    let detectedItems = [];
-    
-    // 1. Limpiar bóveda para el nuevo mensaje (evita mezclar datos de chats previos)
-    dataVault = {}; 
-    
-    let counters = { DNI:0, RUC:0, PER:0, EMP:0, LOC:0, MAIL:0, TELF:0 };
 
-    // Función Helper para reemplazar y guardar en la bóveda
-    const tokenize = (match, type, cleanValue) => {
-        const token = `{{${type}_${counters[type]}}}`;
-        dataVault[token] = cleanValue || match; // Guardamos el valor real asociado al token
-        counters[type]++;
-        detectedItems.push(`${type}: ${cleanValue || match} -> ${token}`);
-        return token;
-    };
-
-    // --- REGLAS DE ENCRIPTACIÓN (REGEX) ---
-
-    // 1. EMAILS
-    seguro = seguro.replace(/[\w-\.]+@([\w-]+\.)+[\w-]{2,4}/g, (match) => tokenize(match, 'MAIL'));
-
-    // 2. RUC (11 dígitos, empieza con 10 o 20)
-    seguro = seguro.replace(/\b(10|20)\d{9}\b/g, (match) => tokenize(match, 'RUC'));
-
-    // 3. DNI (8 dígitos exactos)
-    seguro = seguro.replace(/\b\d{8}\b/g, (match) => tokenize(match, 'DNI'));
-
-    // 4. TELÉFONOS (9 dígitos, empieza con 9)
-    seguro = seguro.replace(/\b9\d{8}\b/g, (match) => tokenize(match, 'TELF'));
-
-    // 4.1  Orden de Inspección (Detecta: "OI 12345", "O.I. 12345", "Orden de Inspección 12345")
-    seguro = seguro.replace(/\b(?:OI|O\.I\.|Orden de Inspecci[óo]n)(?:\s+N[°º]?)?\s+\d+\b/gi, (match) => tokenize(match, 'OI'));
-
-    // 5. DIRECCIONES (Contextual)
-    const regexDir = /(?:viv(?:o|e) en|domicilio|direcci[óo]n|calle|av\.|avenida|jr\.|jir[óo]n|psje\.)\s+([a-zA-Z0-9\.\s\-\#]+?)(?=\s*(?:,|$|\.|y la))/gi;
-    seguro = seguro.replace(regexDir, (match, captured) => {
-        const token = tokenize(captured, 'LOC');
-        return match.replace(captured, token);
-    });
-
-    // 6. EMPRESAS (Contextual)
-    const regexEmp = /(?:empresa|raz[óo]n social|consorcio)\s+([a-zA-Z0-9\.\s]+?)(?=\s*(?:,|$|\.|y el))/gi;
-    seguro = seguro.replace(regexEmp, (match, captured) => {
-        const token = tokenize(captured, 'EMP');
-        return match.replace(captured, token);
-    });
-
-    // 7. NOMBRES PROPIOS (Heurístico simple)
-    const regexNom = /(?:soy|me llamo|mi nombre es|usuario|señor|sr\.)\s+([A-ZÁÉÍÓÚ][a-zñáéíóú]+(?:\s+[A-ZÁÉÍÓÚ][a-zñáéíóú]+){1,3})/g;
-    seguro = seguro.replace(regexNom, (match, captured) => {
-        const token = tokenize(captured, 'PER');
-        return match.replace(captured, token);
-    });
-
-    return { 
-        textoProtegido: seguro, 
-        logs: detectedItems 
-    };
-}
-
-// ===============================================================
-// 🔓 RESTAURACIÓN DE DATOS (CLIENT-SIDE)
-// ===============================================================
-function restaurarDatos(textoIA) {
-    let textoRestaurado = textoIA;
-    
-    // Buscamos los tokens en la respuesta de la IA y los reemplazamos por los datos originales de la bóveda
-    for (const [token, valorReal] of Object.entries(dataVault)) {
-        // Usamos un span especial para resaltar el dato restaurado
-        const spanRestaurado = `<span class="restored-data" title="Dato original restaurado: ${valorReal}">${valorReal}</span>`;
-        // Reemplazo global del token
-        textoRestaurado = textoRestaurado.split(token).join(spanRestaurado);
-    }
-    return textoRestaurado;
-}
-
-// ===============================================================
-// 🚀 LÓGICA DE ENVÍO (HACIA EL BACKEND)
-// ===============================================================
 async function handleSend() {
-    const rawText = userInput.value.trim();
-    if (!rawText) return;
-
-    // 1. Mostrar mensaje del usuario en pantalla
-    addMessage(rawText, 'user');
-    userInput.value = '';
+    const text = userInput.value.trim();
     
-    // Bloquear UI mientras carga
-    userInput.disabled = true;
-    sendBtn.disabled = true;
-    loader.style.display = 'block';
+    // Si está vacío, no hacemos nada
+    if (!text) return;
 
-    addLog('IN', rawText);
+    // 1. Mostrar mensaje del usuario en pantalla inmediatamente
+    addMessage(text, 'user');
+    userInput.value = ''; // Limpiar input
+    
+    // 2. Activar estado de "Pensando..."
+    toggleLoading(true);
 
     try {
-        // 2. ENCRIPTACIÓN LOCAL (DLP)
-        // Antes de que salga del navegador, limpiamos los datos.
-        const { textoProtegido, logs } = protegerDatos(rawText);
-        
-        if (logs.length > 0) {
-            addLog('DLP', `Se detectaron ${logs.length} datos sensibles.`, logs.join('<br>'));
-            addLog('INFO', `Enviando al Backend (Node.js): "${textoProtegido}"`);
-        } else {
-            addLog('INFO', "No se detectaron datos sensibles. Enviando limpio...");
-        }
-
-        // 3. PETICIÓN AL BACKEND (Node.js)
+        // 3. CONECTAR CON TU API (BACKEND)
+        // Enviamos el mensaje crudo. El servidor se encarga de la seguridad.
         const response = await fetch(BACKEND_URL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                message: textoProtegido // ¡IMPORTANTE! Enviamos la versión con tokens
-            })
+            body: JSON.stringify({ message: text })
         });
 
         const data = await response.json();
 
-        if (!response.ok || data.error) {
-            throw new Error(data.error || "Error desconocido en el servidor");
+        if (data.error) {
+            // Si el servidor reporta un error controlado
+            addMessage(`Error del sistema: ${data.error}`, 'bot');
+        } else {
+            // 4. MOSTRAR RESPUESTA DE LA IA
+            // La respuesta ya viene con los datos sensibles restaurados desde el servidor
+            formatAndDisplayBotMessage(data.reply);
         }
-        
-        const aiResponseRaw = data.reply;
-        addLog('OUT', aiResponseRaw); 
-
-        // 4. DESENCRIPTACIÓN LOCAL
-        // La IA responde con tokens (ej: "Hola {{PER_0}}"). Aquí los volvemos texto real.
-        const textoFinalUsuario = restaurarDatos(aiResponseRaw);
-        
-        // Verificamos si hubo cambios para loguearlo
-        if (aiResponseRaw !== textoFinalUsuario) {
-            addLog('OK', "Datos sensibles re-inyectados en el navegador del cliente.");
-        }
-
-        // 5. Renderizar respuesta con formato
-        const formatted = textoFinalUsuario
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Negritas Markdown
-            .replace(/\n/g, '<br>'); // Saltos de línea
-
-        addMessage(formatted, 'bot');
 
     } catch (error) {
-        console.error(error);
-        addMessage(`<strong>Error de Conexión:</strong> ${error.message}`, 'bot');
-        addLog('ERR', error.message);
+        console.error("Error de conexión:", error);
+        addMessage("⚠️ Error: No se pudo conectar con el servidor de SUNAFIL. Verifica que el backend esté corriendo (node server.js).", 'bot');
     } finally {
-        // Restaurar estado del input
-        loader.style.display = 'none';
-        userInput.disabled = false;
-        sendBtn.disabled = false;
-        userInput.focus();
+        // 5. Desactivar estado de carga
+        toggleLoading(false);
+        userInput.focus(); // Devolver el foco al usuario
     }
 }
 
-// Función auxiliar para agregar burbujas al chat visual
-function addMessage(html, type) {
-    const div = document.createElement('div');
-    div.className = `message ${type}`;
-    div.innerHTML = html;
-    if (type === 'bot' && !html.includes("Error")) {
-        div.innerHTML += '<div class="source-ref">Soporte SIIT-SDAN-DINI</div>';
+// ===============================================================
+// 🎨 FUNCIONES DE INTERFAZ (UI)
+// ===============================================================
+
+function toggleLoading(isLoading) {
+    if (isLoading) {
+        userInput.disabled = true;
+        sendBtn.disabled = true;
+        loader.style.display = 'block'; // Muestra el indicador de carga
+    } else {
+        userInput.disabled = false;
+        sendBtn.disabled = false;
+        loader.style.display = 'none'; // Oculta el indicador
     }
+}
+
+// Procesa el texto para que las negritas (**) se vean bien en HTML
+function formatAndDisplayBotMessage(rawText) {
+    // Convertir **texto** a <strong>texto</strong>
+    const htmlFormatted = rawText
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
+        .replace(/\n/g, '<br>'); // Convertir saltos de línea a <br>
+
+    addMessage(htmlFormatted, 'bot');
+}
+
+// Agrega la burbuja de chat al HTML
+function addMessage(htmlContent, senderType) {
+    const div = document.createElement('div');
+    div.className = `message ${senderType}`; // 'user' o 'bot'
+    div.innerHTML = htmlContent;
+
+    // Si es el bot, agregamos la firma pequeña
+    if (senderType === 'bot' && !htmlContent.includes("Error")) {
+        div.innerHTML += '<div style="font-size:0.7em; color:#888; margin-top:8px; border-top:1px solid #eee; padding-top:4px;">Soporte SIIT-SDAN-DINI</div>';
+    }
+
     chatBox.appendChild(div);
+    
+    // Auto-scroll hacia abajo
     chatBox.scrollTop = chatBox.scrollHeight;
 }
