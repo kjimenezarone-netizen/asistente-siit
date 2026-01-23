@@ -2,7 +2,7 @@
 // 🔗 CONFIGURACIÓN DE TU API
 // ===============================================================
 //const BACKEND_URL = "http://localhost:5000/chat";
-const BACKEND_URL = "https://login.tailscale.com/f/funnel?node=npTyrsiqTN11CNTRL/chat";
+const BACKEND_URL = "https://lim-cpu2nvx.tail9bc556.ts.net/chat";
 
 // Referencias a los elementos de tu HTML (index.html)
 const chatBox = document.getElementById('chatBox');
