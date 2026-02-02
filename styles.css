@@ -1,10 +1,5 @@
-/* ============================================================
-   ESTILO INSTITUCIONAL SIIT - SUNAFIL (VERSIÓN AZUL)
-   Ref: Basado en imagen visual aprobada (image_3.png)
-   ============================================================ */
-
 :root {
-    /* --- NUEVA PALETA DE COLORES INSTITUCIONALES (AZUL) --- */
+    
     --primary-color: #0E335E;   /* Azul Profundo Institucional (Header/Botones) */
     --primary-dark: #082240;    /* Azul más oscuro (Hover) */
     --accent-blue: #1A5F9E;     /* Azul medio para detalles/bordes */
@@ -25,7 +20,7 @@
     --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
-/* --- RESET BÁSICO --- */
+/* RESET BÁSICO  */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
@@ -39,7 +34,7 @@ body {
     color: #333;
 }
 
-/* --- CONTENEDOR PRINCIPAL --- */
+/* CONTENEDOR PRINCIPAL  */
 .app-container {
     width: 100%;
     height: 100%;
@@ -48,10 +43,10 @@ body {
     display: flex;
     flex-direction: column;
     position: relative;
-    box-shadow: 0 0 30px rgba(0,0,0,0.15); /* Sombra más pronunciada como en la imagen */
+    box-shadow: 0 0 30px rgba(0,0,0,0.15); /* Sombra  */
 }
 
-/* --- HEADER INSTITUCIONAL (AZUL) --- */
+/* HEADER  */
 .header {
     background-color: var(--primary-color); /* Fondo Azul */
     padding: 15px 25px;
@@ -99,7 +94,7 @@ body {
     animation: blink 2s infinite;
 }
 
-/* --- ÁREA DE CHAT --- */
+/* CHAT */
 .chat-area {
     flex: 1;
     background-color: var(--bg-light);
@@ -123,11 +118,11 @@ body {
     word-wrap: break-word;
 }
 
-/* Estilo BOT (Blanco con borde azul delgado) */
+/* Estilo BOT  */
 .message.bot {
     align-self: flex-start;
     background-color: var(--bot-msg-bg);
-    border: 1px solid var(--bot-msg-border); /* Borde azul delgado exacto a la imagen */
+    border: 1px solid var(--bot-msg-border); /* Borde azul delgado  */
     color: #333;
     box-shadow: var(--shadow-soft);
 }
@@ -143,7 +138,7 @@ body {
     text-transform: uppercase;
 }
 
-/* Estilo USUARIO (Azul sólido) */
+/* Estilo USUARIO */
 .message.user {
     align-self: flex-end;
     background-color: var(--user-msg-bg); /* Azul institucional */
@@ -239,6 +234,12 @@ button:disabled {
 /* Animaciones */
 @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+/* Efecto de desvanecimiento y entrada */
+@keyframes fadeInSlide {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 
 /* Media Query Móvil */
 @media (max-width: 600px) {
@@ -250,3 +251,81 @@ button:disabled {
     .input-area { padding: 15px; }
     button { padding: 0 20px; font-size: 0.8rem; }
 }
+
+/*Login*/
+/* =========================================
+   PANTALLA DE LOGIN (Overlay)
+   ========================================= */
+#loginOverlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85); /* Fondo oscuro */
+    display: flex; justify-content: center; align-items: center;
+    z-index: 9999; /* Por encima de todo */
+    backdrop-filter: blur(5px);
+}
+
+.login-card {
+    background: var(--white);
+    padding: 2rem; border-radius: 12px; 
+    width: 90%; max-width: 350px; text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+.login-card h2 { 
+    margin-top: 0; 
+    color: var(--primary-color); /* USAMOS EL AZUL INSTITUCIONAL */
+    font-size: 1.5rem; margin-bottom: 0.5rem; 
+}
+
+.login-card p { 
+    color: #666; font-size: 0.9rem; margin-bottom: 1.5rem; 
+}
+
+.login-input { 
+    width: 100%; padding: 12px; margin: 8px 0; 
+    border: 1px solid #ccc; border-radius: 6px; 
+    box-sizing: border-box; font-size: 1rem;
+}
+
+.login-btn { 
+    width: 100%; margin-top: 15px; 
+    background: var(--primary-color); /* USAMOS EL AZUL INSTITUCIONAL */
+    color: white; border: none; padding: 12px; 
+    cursor: pointer; font-weight: bold; border-radius: 6px; 
+    font-size: 1rem; transition: background 0.3s;
+}
+
+.login-btn:hover { 
+    background: var(--primary-dark); /* USAMOS EL AZUL OSCURO AL PASAR MOUSE */
+}
+
+#loginError { 
+    color: #dc2626; margin-top: 10px; display: none; font-size: 0.9em; font-weight: bold; 
+}
+
+/* VENTANA DE COMUNICADO */
+.fade-in-message {
+    animation: fadeInSlide 0.5s ease forwards;
+}
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 10000; backdrop-filter: blur(4px);
+}
+
+.modal-card {
+    background: white; padding: 25px; border-radius: 12px;
+    width: 90%; max-width: 400px; text-align: center;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+}
+
+.modal-card h3 { color: #0E335E; margin-bottom: 15px; }
+
+.modal-btn {
+    margin-top: 20px; background: #0E335E; color: white;
+    border: none; padding: 10px 20px; border-radius: 6px;
+    cursor: pointer; width: 100%; font-weight: bold;
+}
+
+.modal-btn:hover { background: #082240; }

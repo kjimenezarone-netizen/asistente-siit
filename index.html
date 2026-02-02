@@ -8,6 +8,16 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div id="loginOverlay">
+        <div class="login-card">
+            <h2>🔐 ACCESO SIIT</h2>
+            <p>Ingrese sus credenciales</p>
+            <input type="text" id="loginUser" class="login-input" placeholder="Usuario">
+            <input type="password" id="loginPass" class="login-input" placeholder="Contraseña">
+            <button class="login-btn" onclick="iniciarSesion()">INGRESAR</button>
+            <div id="loginError"></div>
+        </div>
+    </div>
 
     <div class="app-container">
         
@@ -22,12 +32,6 @@
         </header>
 
         <main class="chat-area" id="chatBox">
-            <div class="message bot">
-                <strong>Asistente Virtual SIIT</strong><br>
-                Bienvenido. El protocolo de <b>Protección de Datos (DLP)</b> está activo.<br>
-                Los datos sensibles (DNI, RUC, etc) serán anonimizados automáticamente.
-                <span class="bot-signature">Soporte SDAN-DINI</span>
-            </div>
         </main>
 
         <div class="typing-indicator" id="loader">
@@ -46,9 +50,24 @@
         </div>
 
     </div>
+    <div id="modalComunicado" class="modal-overlay" style="display:none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>📢 AVISO DE SEGURIDAD</h3>
+                <button class="close-modal" onclick="cerrarComunicado()">×</button>
+            </div>
+            <div class="modal-body">
+                <p>Bienvenido al <b>Soporte Técnico SIIT</b>.</p>
+                <p>Se le informa que el protocolo de <b>Protección de Datos (DLP)</b> se encuentra activo.</p>
+                <p>Toda información sensible (DNI, RUC, Nombres) será anonimizada para cumplir con la Ley N.° 29733.</p>
+            </div>
+            <button class="modal-btn" onclick="cerrarComunicado()">ENTENDIDO</button>
+        </div>
+    </div>
 
     <script src="script.js"></script>
-
+<!--
+    
     <script>
         const chatArea = document.getElementById('chatBox');
         
@@ -64,7 +83,7 @@
             }
 
             chatArea.appendChild(div);
-            chatArea.scrollTop = chatArea.scrollHeight; // Auto-scroll
+            chatArea.scrollTop = chatArea.scrollHeight; 
         };
     </script>
 
@@ -78,6 +97,6 @@
         });
     })();
     </script>
-
+-->
 </body>
 </html>
