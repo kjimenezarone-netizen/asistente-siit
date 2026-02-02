@@ -1,7 +1,7 @@
 const SESSION_ID = 'sess-' + Math.random().toString(36).substr(2, 9);
 // CONFIGURACIÓN (Asegúrate de que el puerto coincida con tu backend)
 //const BACKEND_URL = "http://localhost:7000";
-const BACKEND_URL = "https://lim-cpu2nvx.tail9bc556.ts.net/";
+const BACKEND_URL = "https://lim-cpu2nvx.tail9bc556.ts.net";
 
 let SESSION_TOKEN = null;
 let CURRENT_USER = null;
